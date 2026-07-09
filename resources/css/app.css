@@ -1,0 +1,38 @@
+@import 'tailwindcss';
+@import './themes.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* expõe as variáveis do Orbit como utilities Tailwind
+   (bg-orbit-bg, text-orbit-accent, font-orbit, rounded-orbit, …) */
+@theme inline {
+  --color-orbit-bg:      var(--orbit-bg);
+  --color-orbit-panel:   var(--orbit-bg-panel);
+  --color-orbit-surface: var(--orbit-bg-surface);
+  --color-orbit-fg:      var(--orbit-fg);
+  --color-orbit-muted:   var(--orbit-fg-muted);
+  --color-orbit-subtle:  var(--orbit-fg-subtle);
+  --color-orbit-accent:  var(--orbit-accent);
+  --color-orbit-success: var(--orbit-success);
+  --color-orbit-danger:  var(--orbit-danger);
+  --color-orbit-warning: var(--orbit-warning);
+  --color-orbit-border:  var(--orbit-border);
+  --font-orbit:          var(--orbit-font-sans);
+  --font-orbit-mono:     var(--orbit-font-mono);
+  --radius-orbit:        var(--orbit-radius);
+  --radius-orbit-sm:     var(--orbit-radius-sm);
+  --radius-orbit-lg:     var(--orbit-radius-lg);
+}
+
+/* estilos base que usam as variáveis do tema ativo */
+body {
+  background-color: var(--orbit-bg);
+  color: var(--orbit-fg);
+  font-family: var(--orbit-font-sans);
+  font-size: var(--orbit-font-size);
+  line-height: var(--orbit-line-height);
+  letter-spacing: var(--orbit-letter-spacing);
+}

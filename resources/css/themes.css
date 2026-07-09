@@ -1,0 +1,96 @@
+/* Fontes (Inter, JetBrains Mono, Share Tech Mono) são self-hosted:
+   baixadas no build pelo laravel-vite-plugin (vite.config.js) e
+   servidas via diretiva @fonts no layout — o app funciona offline. */
+
+/* ── TEMA MODERN ─────────────────────────────────────── */
+.modern {
+  --orbit-bg:           #0F0F0F;
+  --orbit-bg-panel:     #1A1A1A;
+  --orbit-bg-surface:   #2A2A2A;
+  --orbit-fg:           #E8E8E6;
+  --orbit-fg-muted:     #C8C7C0;
+  --orbit-fg-subtle:    #888780;
+  --orbit-accent:       #6366F1;
+  --orbit-success:      #22C55E;
+  --orbit-danger:       #EF4444;
+  --orbit-warning:      #EF9F27;
+  --orbit-border:       #2A2A2A;
+  --orbit-border-strong:#3A3A3A;
+  --orbit-font-sans:    'Inter', system-ui, sans-serif;
+  --orbit-font-mono:    'JetBrains Mono', 'Courier New', monospace;
+  --orbit-font-size:    14px;
+  --orbit-line-height:  1.6;
+  --orbit-letter-spacing: normal;
+  --orbit-radius:       8px;
+  --orbit-radius-sm:    4px;
+  --orbit-radius-lg:    12px;
+  --orbit-border-width: 0.5px;
+}
+
+/* ── TEMA RETRO ──────────────────────────────────────── */
+.retro {
+  --orbit-bg:           #080C0F;
+  --orbit-bg-panel:     #04080C;
+  --orbit-bg-surface:   #0F1E28;
+  --orbit-fg:           #C8DDE8;
+  --orbit-fg-muted:     #8AAABB;
+  --orbit-fg-subtle:    #2A6A7A;
+  --orbit-accent:       #00C8E8;
+  --orbit-success:      #00E8A0;
+  --orbit-danger:       #FF4466;
+  --orbit-warning:      #EF9F27;
+  --orbit-border:       #1A3A50;
+  --orbit-border-strong:#2A5A70;
+  --orbit-font-sans:    'Share Tech Mono', 'Courier New', monospace;
+  --orbit-font-mono:    'Share Tech Mono', 'Courier New', monospace;
+  --orbit-font-size:    13px;
+  --orbit-line-height:  1.5;
+  --orbit-letter-spacing: 0.02em;
+  --orbit-radius:       2px;
+  --orbit-radius-sm:    1px;
+  --orbit-radius-lg:    4px;
+  --orbit-border-width: 0.5px;
+}
+
+/* ── SCANLINES — exclusivo do retro ─────────────────── */
+.retro .orbit-scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.18) 2px,
+    rgba(0,0,0,0.18) 4px
+  );
+}
+
+/* ── CURSOR PISCANTE — exclusivo do retro ───────────── */
+.retro .orbit-cursor {
+  display: inline-block;
+  width: 6px;
+  height: 12px;
+  background: var(--orbit-accent);
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── BLOCO TERMINAL — exclusivo do retro ────────────── */
+.retro .orbit-block-title::before { content: '┌─ '; }
+.retro .orbit-block-title::after  { content: ' ──'; }
+.retro .orbit-block-footer::before{ content: '└─ '; }
+.retro .orbit-block-footer::after { content: ' ──┘'; }
+
+/* ── BORDAS DE MONITOR — exclusivo do retro ─────────── */
+.retro .orbit-monitor {
+  outline: 2px solid #0A1E2A;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px #1A3A50;
+}
