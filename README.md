@@ -64,7 +64,7 @@ Depois da instalação é só abrir o **Orbit** pelo atalho — o primeiro boot 
 de 30 a 60 segundos. Se preferir o terminal (Linux):
 
 ```bash
-make dev   # app desktop (janela própria via NativePHP/Electron)
+make dev   # app desktop (NativePHP/Electron) + vite com hot reload
 make web   # no navegador (http://localhost:8000)
 make test  # roda a suíte de testes
 ```
