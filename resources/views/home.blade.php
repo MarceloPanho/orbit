@@ -4,17 +4,14 @@
     <div style="flex:1; overflow-y:auto; padding:32px; display:flex; flex-direction:column;">
 
         {{-- Saudação --}}
-        <div>
-            <h1 style="font-size:22px; font-weight:500; color:var(--orbit-fg); margin:0;">Bom dia, Marcelo.</h1>
-            <p style="font-size:13px; color:var(--orbit-fg-subtle); margin:4px 0 0;">Terça-feira, 1 de julho de 2025</p>
-        </div>
+        <x-ui.page-header title="Bom dia, Marcelo." subtitle="Terça-feira, 1 de julho de 2025" />
 
         {{-- Cards de resumo --}}
         <div style="display:flex; gap:16px; margin-top:24px; flex-wrap:wrap;">
-            <x-home.summary-card label="Saldo do mês"   value="R$ —,——"              icon="◎" />
-            <x-home.summary-card label="Próximo evento" value="Nenhum evento hoje"   icon="▶" />
-            <x-home.summary-card label="Hábitos hoje"   value="0 / 0 concluídos"     icon="▼" />
-            <x-home.summary-card label="Notas recentes" value="Nenhuma nota recente" icon="?" />
+            <x-ui.stat-card label="Saldo do mês"   value="R$ —,——"              icon="◎" />
+            <x-ui.stat-card label="Próximo evento" value="Nenhum evento hoje"   icon="▶" />
+            <x-ui.stat-card label="Hábitos hoje"   value="0 / 0 concluídos"     icon="▼" />
+            <x-ui.stat-card label="Notas recentes" value="Nenhuma nota recente" icon="?" />
         </div>
 
         {{-- Área vazia --}}

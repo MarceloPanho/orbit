@@ -1,3 +1,5 @@
+{{-- Cartão de indicador (rótulo + valor + ícone). Substitui o home.summary-card.
+     No retro o rótulo vira [MAIÚSCULO] e o ícone é omitido. --}}
 @props(['label', 'value', 'icon' => null])
 
 @php $isRetro = auth()->user()?->isRetro(); @endphp

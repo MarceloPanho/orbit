@@ -4,10 +4,10 @@
     $isRetro = auth()->user()?->isRetro();
 
     $modules = [
-        'financas' => ['label' => 'Finanças', 'children' => ['Visão geral', 'Transações', 'Orçamentos', 'Metas']],
-        'agenda'   => ['label' => 'Agenda',   'children' => ['Hoje', 'Semana', 'Eventos', 'Tarefas']],
-        'notas'    => ['label' => 'Notas',    'children' => ['Todas as notas', 'Por tag', 'Favoritas']],
-        'habitos'  => ['label' => 'Hábitos',  'children' => ['Hoje', 'Histórico', 'Metas']],
+        'financas' => ['label' => 'Finanças', 'children' => ['Dashboard' => null, 'Gastos' => 'expense', 'Renda/Recebimentos' => null, 'Investimentos' => null, 'Assinaturas' => null]],
+        // 'agenda'   => ['label' => 'Agenda',   'children' => ['Hoje', 'Semana', 'Eventos', 'Tarefas']],
+        // 'notas'    => ['label' => 'Notas',    'children' => ['Todas as notas', 'Por tag', 'Favoritas']],
+        // 'habitos'  => ['label' => 'Hábitos',  'children' => ['Hoje', 'Histórico', 'Metas']],
     ];
 @endphp
 
@@ -37,30 +37,10 @@
     <nav style="flex:1; overflow:hidden; padding:12px 8px;" x-data="{ open: 'financas' }">
 
         {{-- Seção: módulos --}}
-        @if($isRetro)
-            <div style="font-size:9px; color:var(--orbit-fg-subtle); padding:4px 8px; white-space:nowrap; overflow:hidden;">── MODULOS ──────────────</div>
-        @else
-            <div style="font-size:10px; color:var(--orbit-fg-subtle); text-transform:uppercase; letter-spacing:0.08em; padding:4px 8px;">Módulos</div>
-        @endif
+        <x-ui.nav-section label="Módulos" />
 
         {{-- Dashboard --}}
-        <a href="{{ route('home') }}" style="
-            display:flex; align-items:center; gap:8px; text-decoration:none; margin-top:4px;
-            @if($isRetro)
-                font-size:12px; padding:5px 8px;
-                color: {{ $active === 'dashboard' ? 'var(--orbit-accent)' : 'var(--orbit-fg-muted)' }};
-            @else
-                font-size:14px; padding:8px 8px; border-radius:6px;
-                color: {{ $active === 'dashboard' ? 'var(--orbit-accent)' : 'var(--orbit-fg-muted)' }};
-                background: {{ $active === 'dashboard' ? 'color-mix(in srgb, var(--orbit-accent) 10%, transparent)' : 'transparent' }};
-            @endif
-        ">
-            @if($isRetro)
-                <span>{{ $active === 'dashboard' ? '>' : ' ' }}</span><span>Dashboard</span>
-            @else
-                <span aria-hidden="true">◎</span><span>Dashboard</span>
-            @endif
-        </a>
+        <x-ui.nav-item :href="route('home')" icon="◎" :active="$active === 'dashboard'" style="margin-top:4px;">Dashboard</x-ui.nav-item>
 
         {{-- Módulos expansíveis (accordion: uma aba aberta por vez) --}}
         @foreach($modules as $key => $module)
@@ -81,8 +61,8 @@
             </button>
 
             <div x-show="open === '{{ $key }}'" x-transition x-cloak>
-                @foreach($module['children'] as $child)
-                    <a href="#" style="
+                @foreach($module['children'] as $child => $childRoute)
+                     <a href="{{ $childRoute ? route($childRoute) : '#' }}" style="
                         display:block; text-decoration:none;
                         @if($isRetro)
                             font-size:11px; padding:3px 8px 3px 20px; color:var(--orbit-fg-subtle);
@@ -97,39 +77,12 @@
         @endforeach
 
         {{-- Seção: sistema --}}
-        @if($isRetro)
-            <div style="font-size:9px; color:var(--orbit-fg-subtle); padding:12px 8px 4px; white-space:nowrap; overflow:hidden;">── SISTEMA ──────────────</div>
-        @else
-            <div style="border-top:1px solid var(--orbit-border); margin:12px 8px 0;"></div>
-            <div style="font-size:10px; color:var(--orbit-fg-subtle); text-transform:uppercase; letter-spacing:0.08em; padding:8px 8px 4px;">Sistema</div>
-        @endif
+        <x-ui.nav-section label="Sistema" divider />
 
         {{-- Configurações --}}
-        <a href="{{ route('settings') }}" style="
-            display:flex; align-items:center; gap:8px; text-decoration:none; margin-top:4px;
-            @if($isRetro)
-                font-size:12px; padding:5px 8px;
-                color: {{ $active === 'settings' ? 'var(--orbit-accent)' : 'var(--orbit-fg-muted)' }};
-            @else
-                font-size:14px; padding:8px 8px; border-radius:6px;
-                color: {{ $active === 'settings' ? 'var(--orbit-accent)' : 'var(--orbit-fg-muted)' }};
-                background: {{ $active === 'settings' ? 'color-mix(in srgb, var(--orbit-accent) 10%, transparent)' : 'transparent' }};
-            @endif
-        ">
-            @if($isRetro)
-                <span>{{ $active === 'settings' ? '>' : ' ' }}</span><span>Configurações</span>
-            @else
-                <span aria-hidden="true">⚙</span><span>Configurações</span>
-            @endif
-        </a>
+        <x-ui.nav-item :href="route('settings')" icon="⚙" :active="$active === 'settings'" style="margin-top:4px;">Configurações</x-ui.nav-item>
 
         {{-- Ajuda --}}
-        <a href="#" style="
-            display:flex; align-items:center; gap:8px; text-decoration:none; margin-top:2px; color:var(--orbit-fg-muted);
-            @if($isRetro) font-size:12px; padding:5px 8px; @else font-size:14px; padding:8px 8px; border-radius:6px; @endif
-        ">
-            @if($isRetro)<span> </span>@else<span aria-hidden="true">?</span>@endif
-            <span>Ajuda</span>
-        </a>
+        <x-ui.nav-item href="#" icon="?" style="margin-top:2px;">Ajuda</x-ui.nav-item>
     </nav>
 </aside>
