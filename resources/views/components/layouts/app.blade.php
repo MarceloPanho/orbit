@@ -43,6 +43,10 @@
         </div>
     @endif
 
+    {{-- Diálogos globais (estilo swal) --}}
+    <x-ui.alert-dialog />
+    <x-ui.confirm-dialog />
+
     @livewireScripts
 </body>
 </html>

@@ -5,10 +5,14 @@ namespace App\Livewire\Finance;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\PaymentMethod;
+use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ExpenseManager extends Component
 {
+    use WithPagination;
+
     // --- Formulário de gasto ---
     public ?int $editingId = null;
     public string $item = '';
@@ -17,11 +21,8 @@ class ExpenseManager extends Component
     public ?int $paymentMethodId = null;
     public string $spentAt = '';
 
-    // --- Gestão de categorias / métodos ---
-    public string $newCategory = '';
+    // --- Gestão de métodos (categorias vivem no ExpenseCategoryManager) ---
     public string $newMethod = '';
-    public ?int $editingCategoryId = null;
-    public string $editingCategoryName = '';
     public ?int $editingMethodId = null;
     public string $editingMethodName = '';
 
@@ -32,6 +33,17 @@ class ExpenseManager extends Component
     public function mount(): void
     {
         $this->spentAt = today()->toDateString();
+    }
+
+    // Volta pra primeira página ao filtrar, evitando páginas vazias.
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFilterCategoryId(): void
+    {
+        $this->resetPage();
     }
 
     protected function rules(): array
@@ -107,47 +119,22 @@ class ExpenseManager extends Component
 
     // ============ Categorias / Métodos ============
 
-    public function addCategory(): void
+    /**
+     * O ExpenseCategoryManager (modal) avisa quando a lista muda. Basta o
+     * re-render para os selects se reconstruírem; aqui só cuidamos das seleções
+     * que apontavam para uma categoria recém-excluída.
+     */
+    #[On('expense-categories-updated')]
+    public function refreshCategories(): void
     {
-        $data = $this->validate(
-            ['newCategory' => ['required', 'string', 'max:255', 'unique:expense_categories,name']],
-            attributes: ['newCategory' => 'categoria'],
-        );
-
-        ExpenseCategory::create(['name' => $data['newCategory']]);
-        $this->newCategory = '';
-        $this->dispatch('close-modal', name: 'add-category');
-    }
-
-    public function startEditCategory(int $id): void
-    {
-        $category = ExpenseCategory::findOrFail($id);
-        $this->editingCategoryId = $category->id;
-        $this->editingCategoryName = $category->name;
-    }
-
-    public function saveCategory(): void
-    {
-        $data = $this->validate(
-            ['editingCategoryName' => ['required', 'string', 'max:255', 'unique:expense_categories,name,'.$this->editingCategoryId]],
-            attributes: ['editingCategoryName' => 'categoria'],
-        );
-
-        ExpenseCategory::findOrFail($this->editingCategoryId)->update(['name' => $data['editingCategoryName']]);
-        $this->reset(['editingCategoryId', 'editingCategoryName']);
-    }
-
-    public function deleteCategory(int $id): void
-    {
-        $category = ExpenseCategory::findOrFail($id);
-
-        if ($category->expenses()->exists()) {
-            session()->flash('error', "A categoria \"{$category->name}\" está em uso e não pode ser excluída.");
-
-            return;
+        if ($this->expenseCategoryId && ! ExpenseCategory::whereKey($this->expenseCategoryId)->exists()) {
+            $this->expenseCategoryId = null;
         }
 
-        $category->delete();
+        if ($this->filterCategoryId && ! ExpenseCategory::whereKey($this->filterCategoryId)->exists()) {
+            $this->filterCategoryId = null;
+            $this->resetPage();
+        }
     }
 
     public function addMethod(): void
@@ -197,30 +184,34 @@ class ExpenseManager extends Component
 
     public function render()
     {
-        $expenses = Expense::query()
-            ->with(['category', 'paymentMethod'])
+        // Base filtrada — reaproveitada na tabela (paginada) e nos agregados (totais).
+        $base = Expense::query()
             ->when($this->search !== '', fn ($q) => $q->where('item', 'like', '%'.$this->search.'%'))
-            ->when($this->filterCategoryId, fn ($q) => $q->where('expense_category_id', $this->filterCategoryId))
+            ->when($this->filterCategoryId, fn ($q) => $q->where('expense_category_id', $this->filterCategoryId));
+
+        $expenses = (clone $base)
+            ->with(['category', 'paymentMethod'])
             ->latest('spent_at')
             ->latest('id')
-            ->get();
+            ->paginate(10);
 
-        $total = $expenses->sum('value');
+        // Totais consideram TODOS os registros filtrados, não só a página atual.
+        $total = (clone $base)->sum('value');
+        $count = (clone $base)->count();
 
-        $topCategory = $expenses
-            ->groupBy(fn ($e) => $e->category?->name)
-            ->map(fn ($group) => $group->sum('value'))
-            ->sortDesc()
-            ->keys()
-            ->first();
+        $topCategoryId = (clone $base)
+            ->selectRaw('expense_category_id, SUM(value) as agg')
+            ->groupBy('expense_category_id')
+            ->orderByDesc('agg')
+            ->value('expense_category_id');
 
         return view('livewire.finance.expense-manager', [
             'expenses' => $expenses,
             'categories' => ExpenseCategory::orderBy('name')->get(),
             'methods' => PaymentMethod::orderBy('name')->get(),
             'total' => $total,
-            'count' => $expenses->count(),
-            'topCategory' => $topCategory ?? '—',
+            'count' => $count,
+            'topCategory' => $topCategoryId ? (ExpenseCategory::find($topCategoryId)?->name ?? '—') : '—',
         ]);
     }
 }

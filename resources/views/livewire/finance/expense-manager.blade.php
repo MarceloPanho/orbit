@@ -41,6 +41,12 @@
             </div>
             <div style="flex:1; min-width:140px;">
                 <x-ui.select label="Categoria" wire:model="expenseCategoryId">
+                    <x-slot:action>
+                        <button type="button"
+                            x-on:click="$dispatch('open-modal', 'manage-categories')"
+                            title="Gerenciar categorias"
+                            style="background:none; border:none; padding:0; cursor:pointer; color:var(--orbit-fg-subtle); font-size:13px; line-height:1;">⚙</button>
+                    </x-slot:action>
                     <option value="">Selecione…</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -71,75 +77,41 @@
         </form>
     </x-ui.card>
 
-    {{-- Gestão de categorias e métodos --}}
-    <x-ui.card title="Categorias e métodos">
-        <div style="display:flex; gap:32px; flex-wrap:wrap;">
+    {{-- Gestão de métodos de pagamento (categorias ficam no modal) --}}
+    <x-ui.card title="Métodos de pagamento">
+        <x-slot:actions>
+            <x-ui.button type="button" variant="ghost" icon="+" x-on:click="$dispatch('open-modal', 'add-method')">Cadastrar</x-ui.button>
+        </x-slot:actions>
 
-            {{-- Categorias --}}
-            <div style="flex:1; min-width:240px;">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-                    <div style="flex:1; font-size:11px; color:var(--orbit-fg-subtle); text-transform:uppercase; letter-spacing:0.08em;">Categorias</div>
-                    <x-ui.button type="button" variant="ghost" icon="+" x-on:click="$dispatch('open-modal', 'add-category')">Cadastrar</x-ui.button>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+            @forelse($methods as $method)
+                <div wire:key="method-{{ $method->id }}" style="display:flex; gap:8px; align-items:center;">
+                    @if($editingMethodId === $method->id)
+                        <x-ui.input type="text" wire:model="editingMethodName" wire:keydown.enter="saveMethod" style="flex:1;" />
+                        <x-ui.button type="button" wire:click="saveMethod">OK</x-ui.button>
+                    @else
+                        <span style="flex:1; font-size:13px; color:var(--orbit-fg);">{{ $method->name }}</span>
+                        <button type="button" wire:click="startEditMethod({{ $method->id }})" title="Renomear" style="background:none; border:none; cursor:pointer; color:var(--orbit-fg-subtle); font-size:13px;">✎</button>
+                        <button type="button"
+                            x-on:click="$dispatch('confirm', {
+                                type: 'error',
+                                title: 'Excluir método',
+                                message: {{ Js::from('Deseja realmente excluir o método «'.$method->name.'»?') }},
+                                confirmText: 'Excluir',
+                                onConfirm: () => $wire.deleteMethod({{ $method->id }}),
+                            })"
+                            title="Excluir" style="background:none; border:none; cursor:pointer; color:var(--orbit-danger); font-size:13px;">✕</button>
+                    @endif
                 </div>
-
-                <div style="display:flex; flex-direction:column; gap:6px;">
-                    @forelse($categories as $category)
-                        <div wire:key="cat-{{ $category->id }}" style="display:flex; gap:8px; align-items:center;">
-                            @if($editingCategoryId === $category->id)
-                                <x-ui.input type="text" wire:model="editingCategoryName" wire:keydown.enter="saveCategory" style="flex:1;" />
-                                <x-ui.button type="button" wire:click="saveCategory">OK</x-ui.button>
-                            @else
-                                <span style="flex:1; font-size:13px; color:var(--orbit-fg);">{{ $category->name }}</span>
-                                <button type="button" wire:click="startEditCategory({{ $category->id }})" title="Renomear" style="background:none; border:none; cursor:pointer; color:var(--orbit-fg-subtle); font-size:13px;">✎</button>
-                                <button type="button" wire:click="deleteCategory({{ $category->id }})" wire:confirm="Excluir a categoria «{{ $category->name }}»?" title="Excluir" style="background:none; border:none; cursor:pointer; color:var(--orbit-danger); font-size:13px;">✕</button>
-                            @endif
-                        </div>
-                    @empty
-                        <span style="font-size:13px; color:var(--orbit-fg-subtle);">Nenhuma categoria ainda.</span>
-                    @endforelse
-                </div>
-            </div>
-
-            {{-- Métodos de pagamento --}}
-            <div style="flex:1; min-width:240px;">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-                    <div style="flex:1; font-size:11px; color:var(--orbit-fg-subtle); text-transform:uppercase; letter-spacing:0.08em;">Métodos de pagamento</div>
-                    <x-ui.button type="button" variant="ghost" icon="+" x-on:click="$dispatch('open-modal', 'add-method')">Cadastrar</x-ui.button>
-                </div>
-
-                <div style="display:flex; flex-direction:column; gap:6px;">
-                    @forelse($methods as $method)
-                        <div wire:key="method-{{ $method->id }}" style="display:flex; gap:8px; align-items:center;">
-                            @if($editingMethodId === $method->id)
-                                <x-ui.input type="text" wire:model="editingMethodName" wire:keydown.enter="saveMethod" style="flex:1;" />
-                                <x-ui.button type="button" wire:click="saveMethod">OK</x-ui.button>
-                            @else
-                                <span style="flex:1; font-size:13px; color:var(--orbit-fg);">{{ $method->name }}</span>
-                                <button type="button" wire:click="startEditMethod({{ $method->id }})" title="Renomear" style="background:none; border:none; cursor:pointer; color:var(--orbit-fg-subtle); font-size:13px;">✎</button>
-                                <button type="button" wire:click="deleteMethod({{ $method->id }})" wire:confirm="Excluir o método «{{ $method->name }}»?" title="Excluir" style="background:none; border:none; cursor:pointer; color:var(--orbit-danger); font-size:13px;">✕</button>
-                            @endif
-                        </div>
-                    @empty
-                        <span style="font-size:13px; color:var(--orbit-fg-subtle);">Nenhum método ainda.</span>
-                    @endforelse
-                </div>
-            </div>
-
+            @empty
+                <span style="font-size:13px; color:var(--orbit-fg-subtle);">Nenhum método ainda.</span>
+            @endforelse
         </div>
     </x-ui.card>
 
-    {{-- Modal: cadastrar categoria --}}
-    <x-ui.modal name="add-category" title="Nova categoria">
-        <form wire:submit="addCategory" style="display:flex; flex-direction:column; gap:12px;">
-            <div>
-                <x-ui.input label="Nome" type="text" placeholder="Ex.: Alimentação, Transporte…" wire:model="newCategory" />
-                @error('newCategory') <span style="font-size:11px; color:var(--orbit-danger);">{{ $message }}</span> @enderror
-            </div>
-            <div style="display:flex; justify-content:flex-end; gap:8px;">
-                <x-ui.button type="button" variant="ghost" x-on:click="show = false">Cancelar</x-ui.button>
-                <x-ui.button type="submit">Salvar</x-ui.button>
-            </div>
-        </form>
+    {{-- Modal: gestão completa de categorias (mesmo componente da página /finance/expense-category) --}}
+    <x-ui.modal name="manage-categories" title="Categorias" maxWidth="720px">
+        <livewire:finance.expense-category-manager :embedded="true" :key="'manage-categories'" />
     </x-ui.modal>
 
     {{-- Modal: cadastrar método de pagamento --}}
@@ -186,8 +158,15 @@
                     <x-ui.td>{{ $expense->paymentMethod?->name ?? '—' }}</x-ui.td>
                     <x-ui.td align="right" tone="danger">− {{ $money($expense->value) }}</x-ui.td>
                     <x-ui.td align="right" nowrap>
-                        <button type="button" wire:click="editExpense({{ $expense->id }})" style="background:none; border:none; cursor:pointer; color:var(--orbit-fg-subtle); font-size:13px; margin-right:8px;">Editar</button>
-                        <button type="button" wire:click="deleteExpense({{ $expense->id }})" wire:confirm="Excluir este lançamento?" style="background:none; border:none; cursor:pointer; color:var(--orbit-danger); font-size:13px;">Excluir</button>
+                        <x-ui.action-button icon="✎" wire:click="editExpense({{ $expense->id }})">Editar</x-ui.action-button>
+                        <x-ui.action-button icon="✕" tone="danger"
+                            x-on:click="$dispatch('confirm', {
+                                type: 'error',
+                                title: 'Excluir lançamento',
+                                message: {{ Js::from('Deseja realmente excluir o lançamento «'.$expense->item.'»?') }},
+                                confirmText: 'Excluir',
+                                onConfirm: () => $wire.deleteExpense({{ $expense->id }}),
+                            })">Excluir</x-ui.action-button>
                     </x-ui.td>
                 </x-ui.tr>
             @empty
@@ -206,6 +185,8 @@
                 </x-slot:foot>
             @endif
         </x-ui.table>
+
+        <x-ui.pagination :paginator="$expenses" />
     </x-ui.card>
 
 </div>

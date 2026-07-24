@@ -40,3 +40,47 @@ body {
   line-height: var(--orbit-line-height);
   letter-spacing: var(--orbit-letter-spacing);
 }
+
+/* Realce sutil no hover/active para TODOS os botões.
+   Usa filter (não background), que não é definido inline em lugar
+   nenhum — assim funciona mesmo com os estilos inline dos componentes,
+   que de outra forma impediriam sobrescrever cor no :hover. */
+button {
+  transition: filter 0.15s ease;
+}
+button:not(:disabled):hover {
+  filter: brightness(1.4);
+}
+button:not(:disabled):active {
+  filter: brightness(0.94);
+}
+button:disabled {
+  filter: none;
+}
+
+/* Botão de ação em pílula (x-ui.action-button): discreto em repouso,
+   preenche com tint da cor semântica (--tone) no hover. */
+.orbit-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--orbit-fg-subtle);
+  background: transparent;
+  border: var(--orbit-border-width) solid var(--orbit-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+.orbit-action-btn + .orbit-action-btn {
+  margin-left: 6px;
+}
+.orbit-action-btn:hover {
+  color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+  border-color: color-mix(in srgb, var(--tone) 45%, transparent);
+}
