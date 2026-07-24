@@ -6,6 +6,10 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* Esconde elementos Alpine (x-cloak) até o Alpine inicializar,
+   evitando flash de conteúdo — ex.: overlay do x-ui.modal. */
+[x-cloak] { display: none !important; }
+
 /* expõe as variáveis do Orbit como utilities Tailwind
    (bg-orbit-bg, text-orbit-accent, font-orbit, rounded-orbit, …) */
 @theme inline {
