@@ -1,4 +1,9 @@
-.PHONY: install dev web test
+.PHONY: install dev web test app-artisan update check-update
+
+# Banco de uso real (o que o atalho abre), fora do repositório. Os alvos abaixo
+# não exportam DB_DATABASE de propósito: dev, web e test usam o banco
+# descartável do repo (database/database.sqlite).
+ORBIT_DB ?= $(HOME)/.local/share/orbit/orbit.sqlite
 
 # setup completo após clonar (deps, banco, assets e atalho com ícone)
 install:
@@ -16,3 +21,15 @@ web:
 
 test:
 	php artisan test
+
+# artisan contra o banco de uso real, ex.: make app-artisan c="migrate:status"
+app-artisan:
+	DB_DATABASE="$(ORBIT_DB)" php artisan $(c)
+
+# mesma atualização do botão em Configurações (pull + deps + assets + migrations)
+update:
+	bash scripts/update.sh
+
+# só checa e grava o status lido pela tela de Configurações
+check-update:
+	bash scripts/check-update.sh && cat storage/app/orbit-update.json

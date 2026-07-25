@@ -19,16 +19,45 @@ fi
 # --no-dependencies: as deps do Electron já foram instaladas pelo install.sh
 CMD="php artisan native:run --no-queue --no-dependencies"
 
+# Sem terminal (clique no atalho): loga em arquivo e avisa que está subindo
+# (o primeiro boot leva ~30-60s). Redireciona antes de preparar o banco para
+# que erros de migração também caiam no log.
+if [ ! -t 1 ]; then
+    LOG_DIR="$HOME/.config/orbit-dev"
+    mkdir -p "$LOG_DIR"
+    exec >> "$LOG_DIR/launcher.log" 2>&1
+    echo "── $(date '+%F %T') · iniciando Orbit pelo atalho ──"
+    command -v notify-send >/dev/null && notify-send -i "$PROJECT_DIR/resources/icons/orbit.png" "Orbit" "Iniciando… a janela abre em instantes." || true
+fi
+
+# ── Banco de uso real ───────────────────────────────────────────
+# Fica FORA do repositório: sobrevive a git clean, re-clone ou apagar a pasta
+# do projeto. O database/database.sqlite do repo é descartável e serve ao
+# make dev / make web / make test, que não exportam DB_DATABASE.
+# O Dotenv do Laravel não sobrescreve variável já exportada, e o NativePHP
+# repassa o process.env ao PHP — então este export vale para o app inteiro.
+ORBIT_DATA_DIR="${ORBIT_DATA_DIR:-$HOME/.local/share/orbit}"
+export DB_DATABASE="$ORBIT_DATA_DIR/orbit.sqlite"
+
+if [ ! -f "$DB_DATABASE" ]; then
+    echo "→ criando banco de uso real em $DB_DATABASE"
+    mkdir -p "$ORBIT_DATA_DIR"
+    touch "$DB_DATABASE"
+    php artisan migrate --seed --force --no-interaction
+else
+    php artisan migrate --force --no-interaction
+fi
+
+# ── Checagem de atualização ─────────────────────────────────────
+# Feita aqui, e não dentro do app, para a janela não pagar latência de rede no
+# boot. O resultado vai para storage/app/orbit-update.json, que a tela de
+# Configurações lê. Falha de rede nunca pode impedir o app de abrir: daí o
+# timeout curto e o `|| true` em tudo.
+"$PROJECT_DIR/scripts/check-update.sh" || true
+
 if [ -t 1 ]; then
     exec $CMD
 fi
 
-# Sem terminal (clique no atalho): loga em arquivo, avisa que está subindo
-# (o primeiro boot leva ~30-60s) e aloca um pseudo-TTY, que o native:run exige.
-LOG_DIR="$HOME/.config/orbit-dev"
-mkdir -p "$LOG_DIR"
-exec >> "$LOG_DIR/launcher.log" 2>&1
-echo "── $(date '+%F %T') · iniciando Orbit pelo atalho ──"
-command -v notify-send >/dev/null && notify-send -i "$PROJECT_DIR/resources/icons/orbit.png" "Orbit" "Iniciando… a janela abre em instantes." || true
-
+# script aloca o pseudo-TTY que o native:run exige.
 exec script -qefc "$CMD" /dev/null

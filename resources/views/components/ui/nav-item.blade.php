@@ -1,6 +1,7 @@
 {{-- Item de navegação (link) com estado ativo.
-       No modern mostra o `icon`; no retro mostra o marcador `>` quando ativo. --}}
-@props(['href' => '#', 'icon' => null, 'active' => false])
+       No modern mostra o `icon`; no retro mostra o marcador `>` quando ativo.
+       badge=true acende um ponto no accent à direita (ex.: atualização disponível). --}}
+@props(['href' => '#', 'icon' => null, 'active' => false, 'badge' => false])
 
 @php
     $isRetro = auth()->user()?->isRetro();
@@ -21,4 +22,8 @@
         <span aria-hidden="true">{{ $icon }}</span>
     @endif
     <span>{{ $slot }}</span>
+    @if($badge)
+        <span aria-label="atualização disponível" title="Atualização disponível"
+              style="margin-left:auto; width:6px; height:6px; border-radius:50%; background:var(--orbit-accent); flex-shrink:0;"></span>
+    @endif
 </a>

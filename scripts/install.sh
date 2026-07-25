@@ -98,3 +98,7 @@ command -v update-desktop-database >/dev/null && update-desktop-database "$APPS_
 bold "✓ Orbit instalado!"
 echo "  Abra pelo menu de aplicativos (procure \"Orbit\") ou pelo atalho na área de trabalho."
 echo "  Alternativas no terminal:  make dev  (app desktop)  |  make web  (navegador)"
+echo
+echo "  Bancos separados: o atalho usa ~/.local/share/orbit/orbit.sqlite (dados reais,"
+echo "  criado e migrado no primeiro clique); make dev/web/test usam o database/database.sqlite"
+echo "  do repositório. Para rodar artisan no banco real: make app-artisan c=\"migrate:status\""
