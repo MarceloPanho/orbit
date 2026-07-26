@@ -1,4 +1,4 @@
-.PHONY: install dev web test app-artisan update check-update
+.PHONY: install dev web test app-artisan update build-linux build-win build-clean
 
 # Banco de uso real (o que o atalho abre), fora do repositório. Os alvos abaixo
 # não exportam DB_DATABASE de propósito: dev, web e test usam o banco
@@ -30,6 +30,17 @@ app-artisan:
 update:
 	bash scripts/update.sh
 
-# só checa e grava o status lido pela tela de Configurações
-check-update:
-	bash scripts/check-update.sh && cat storage/app/orbit-update.json
+# build local para TESTE — nunca distribua o artefato gerado aqui: ele leva o
+# .env de desenvolvimento junto, incluindo a APP_KEY. Releases saem do CI.
+build-linux:
+	php artisan native:build linux x64
+
+build-win:
+	php artisan native:build win x64
+
+# native:reset limpa build/ e dist/ da raiz, mas NÃO a saída real do
+# electron-builder, que fica em nativephp/electron/dist (~670 MB), nem a cópia
+# do app que o build local deixa em vendor/nativephp/desktop/resources/build/app —
+# essa cópia leva um .env com a APP_KEY real do desenvolvedor dentro.
+build-clean:
+	rm -rf nativephp build dist vendor/nativephp/desktop/resources/build/app

@@ -48,13 +48,6 @@ else
     php artisan migrate --force --no-interaction
 fi
 
-# ── Checagem de atualização ─────────────────────────────────────
-# Feita aqui, e não dentro do app, para a janela não pagar latência de rede no
-# boot. O resultado vai para storage/app/orbit-update.json, que a tela de
-# Configurações lê. Falha de rede nunca pode impedir o app de abrir: daí o
-# timeout curto e o `|| true` em tudo.
-"$PROJECT_DIR/scripts/check-update.sh" || true
-
 if [ -t 1 ]; then
     exec $CMD
 fi

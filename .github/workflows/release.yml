@@ -1,0 +1,77 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: build (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: win
+          - os: ubuntu-latest
+            target: linux
+
+    runs-on: ${{ matrix.os }}
+    # Sem isso, um electron-builder travado consome o timeout padrão de 6h do
+    # runner em vez de falhar rápido e liberar o job.
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: sqlite3, pdo_sqlite, zip, fileinfo, mbstring, intl
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependências PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Instalar dependências JS e compilar assets
+        run: |
+          npm ci --no-fund --no-audit
+          npm run build
+
+      # O .env é empacotado no bundle. APP_ENV, APP_DEBUG e APP_KEY são removidos
+      # pelo cleanup_env_keys (config/nativephp.php), mas o artisan precisa de uma
+      # chave válida para rodar durante o build.
+      - name: Preparar .env de produção
+        shell: bash
+        run: |
+          cp .env.example .env
+          php artisan key:generate --ansi
+
+      - name: Derivar a versão da tag
+        shell: bash
+        run: echo "NATIVEPHP_APP_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      # config/nativephp.php define releaseType=draft de propósito: a Release
+      # sobe como rascunho, invisível para quem não está logado e ignorada
+      # pelo auto-updater até alguém publicá-la manualmente na aba Releases do
+      # GitHub. É assim que o dono do repo revisa antes de distribuir — não é
+      # bug, mas fica fácil esquecer esse passo depois do push da tag.
+      - name: Build e publicação
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+          # Redundante com o .env.example, e de propósito: é esta variável que
+          # faz o electron-builder emitir o bloco `publish` (e com ele o
+          # app-update.yml e o latest*.yml de que o auto-update depende).
+          # Explícita aqui, ela não depende de o .env ter sido copiado direito.
+          NATIVEPHP_UPDATER_ENABLED: 'true'
+        run: php artisan native:build ${{ matrix.target }} x64 --publish

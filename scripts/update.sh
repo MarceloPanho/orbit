@@ -77,8 +77,6 @@ if [ -f "$ORBIT_DB" ]; then
         || fail "migração do banco de uso real falhou."
 fi
 
-"$PROJECT_DIR/scripts/check-update.sh" || true
-
 echo "✓ atualizado para $(git rev-parse --short HEAD)"
 
 if [ "$RELAUNCH" = "1" ]; then

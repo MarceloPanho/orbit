@@ -3,9 +3,6 @@
 @php
     $isRetro = auth()->user()?->isRetro();
 
-    // Só lê o JSON gravado pelo launcher no boot — sem rede, sem query.
-    $hasUpdate = app(\App\Support\AppUpdater::class)->hasUpdate();
-
     $modules = [
         'financas' => ['label' => 'Finanças', 'children' => ['Dashboard' => null, 'Gastos' => 'expense', 'Renda/Recebimentos' => null, 'Investimentos' => null, 'Assinaturas' => null, 'Categorias' => 'expense-category']],
         // 'agenda'   => ['label' => 'Agenda',   'children' => ['Hoje', 'Semana', 'Eventos', 'Tarefas']],
@@ -83,7 +80,7 @@
         <x-ui.nav-section label="Sistema" divider />
 
         {{-- Configurações --}}
-        <x-ui.nav-item :href="route('settings')" icon="⚙" :active="$active === 'settings'" :badge="$hasUpdate" style="margin-top:4px;">Configurações</x-ui.nav-item>
+        <x-ui.nav-item :href="route('settings')" icon="⚙" :active="$active === 'settings'" style="margin-top:4px;">Configurações</x-ui.nav-item>
 
         {{-- Ajuda --}}
         <x-ui.nav-item href="#" icon="?" style="margin-top:2px;">Ajuda</x-ui.nav-item>
