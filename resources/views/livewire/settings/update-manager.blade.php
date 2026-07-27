@@ -1,7 +1,7 @@
 <div>
     <x-ui.card title="Atualizações">
         <x-slot:actions>
-            @if($rodandoNoDesktop)
+            @if($appEmpacotado)
                 <button type="button" wire:click="verificar" wire:loading.attr="disabled"
                     style="background:none; border:none; padding:0; cursor:pointer; color:var(--orbit-fg-subtle); font-size:12px;">
                     <span wire:loading.remove wire:target="verificar">verificar agora</span>
@@ -14,7 +14,7 @@
 
             <div style="flex:1; min-width:240px; display:flex; flex-direction:column; gap:6px;">
 
-                @if(! $rodandoNoDesktop)
+                @if(! $appEmpacotado)
                     <span style="font-size:13px; color:var(--orbit-fg);">
                         Atualização automática só existe na versão instalada.
                     </span>
@@ -51,9 +51,9 @@
             </div>
 
             <div>
-                @if($rodandoNoDesktop && $estado === 'disponivel')
+                @if($appEmpacotado && $estado === 'disponivel')
                     <x-ui.button type="button" icon="↓" wire:click="baixar">Baixar</x-ui.button>
-                @elseif($rodandoNoDesktop && $estado === 'pronto')
+                @elseif($appEmpacotado && $estado === 'pronto')
                     <x-ui.button type="button" icon="↻"
                         x-on:click="$dispatch('confirm', {
                             type: 'info',

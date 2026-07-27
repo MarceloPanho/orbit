@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Native\Desktop\Facades\Screen;
 use Native\Desktop\Facades\Window;
 use Native\Desktop\Contracts\ProvidesPhpIni;
 
@@ -13,11 +14,13 @@ class NativeAppServiceProvider implements ProvidesPhpIni
      */
     public function boot(): void
     {
-        // hideMenu() esconde a barra (File, Edit...) sem destruir o menu da
-        // aplicação — os atalhos de zoom do Electron (Ctrl+=/Ctrl+-/Ctrl+0)
-        // vêm do menu View e continuam funcionando.
+        $area = Screen::primary()['workArea'];
+
         Window::open()
-            ->hideMenu();
+            ->hideMenu()
+            ->width($area['width'])
+            ->height($area['height'])
+            ->position($area['x'], $area['y']);
     }
 
     /**

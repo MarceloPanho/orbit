@@ -38,7 +38,7 @@ Pegue o instalador da sua plataforma na **[página de Releases](https://github.c
 |---|---|---|
 | **Windows** 10/11 | `Orbit-x.y.z-setup.exe` | Duplo clique. Cria atalho na área de trabalho. |
 | **Linux** (qualquer distro) | `Orbit-x.y.z.AppImage` | `chmod +x Orbit-*.AppImage` e execute. **Se atualiza sozinho.** |
-| **Linux** (Debian/Ubuntu) | `Orbit-x.y.z.deb` | `sudo apt install ./Orbit-*.deb`. Integra melhor ao sistema, mas **não** se atualiza sozinho. |
+| **Linux** (Debian/Ubuntu) | `orbit_x.y.z_amd64.deb` | `sudo apt install ./orbit_*.deb`. Integra melhor ao sistema, mas **não** se atualiza sozinho. |
 
 > [!TIP]
 > **No Linux, prefira o AppImage.** É o único formato que recebe as atualizações

@@ -34,7 +34,7 @@ class ExpenseCategoryManager extends Component
     }
 
     protected array $validationAttributes = [
-        'name' => 'descrição',
+        'name' => 'nome',
     ];
 
     // ================= Categorias =================

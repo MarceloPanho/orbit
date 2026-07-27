@@ -1,6 +1,6 @@
 {{-- Cards de preview: cada card mostra o visual do próprio tema,
      independente do tema ativo — por isso usam hex literais. --}}
-<div style="display:flex; gap:16px; flex-wrap:wrap;">
+<x-ui.card style="display:flex; gap:16px; flex-wrap:wrap;" title="Temas">
 
     {{-- Card MODERN --}}
     <button
@@ -32,7 +32,7 @@
             width:260px; text-align:left; cursor:pointer; padding:0; overflow:hidden; position:relative;
             background:#080C0F;
             border:{{ $currentTheme === 'retro' ? '1.5px solid var(--orbit-accent)' : '0.5px solid var(--orbit-border)' }};
-            border-radius:var(--orbit-radius-sm);
+            border-radius:var(--orbit-radius-lg);
         "
     >
         {{-- scanlines locais do preview --}}
@@ -47,4 +47,4 @@
         </div>
     </button>
 
-</div>
+</x-ui.card>

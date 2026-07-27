@@ -46,10 +46,11 @@ class User extends Authenticatable
      */
     public static function localUser(): self
     {
+
         return static::query()->oldest('id')->first()
             ?? static::create([
-                'name' => 'Marcelo',
-                'email' => 'marcelohpanho@gmail.com',
+                'name' => '',
+                'email' => 'local@orbit.app',
                 'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(40)),
             ]);
     }

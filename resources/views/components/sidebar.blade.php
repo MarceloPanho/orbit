@@ -9,6 +9,15 @@
         // 'notas'    => ['label' => 'Notas',    'children' => ['Todas as notas', 'Por tag', 'Favoritas']],
         // 'habitos'  => ['label' => 'Hábitos',  'children' => ['Hoje', 'Histórico', 'Metas']],
     ];
+
+    $openModule = null;
+
+    foreach ($modules as $key => $module) {
+        if (in_array(request()->route()?->getName(), array_filter($module['children']), true)) {
+            $openModule = $key;
+            break;
+        }
+    }
 @endphp
 
 <aside style="width:220px; flex-shrink:0; height:100%; background:var(--orbit-bg-panel); border-right:0.5px solid var(--orbit-border); display:flex; flex-direction:column; overflow:hidden;">
@@ -34,7 +43,7 @@
         @endif
     </a>
 
-    <nav style="flex:1; overflow:hidden; padding:12px 8px;" x-data="{ open: 'financas' }">
+    <nav style="flex:1; overflow:hidden; padding:12px 8px;" x-data="{ open: @js($openModule) }">
 
         {{-- Seção: módulos --}}
         <x-ui.nav-section label="Módulos" />
@@ -60,7 +69,7 @@
                 <span>{{ $module['label'] }}</span>
             </button>
 
-            <div x-show="open === '{{ $key }}'" x-transition x-cloak>
+            <div x-show="open === '{{ $key }}'" x-transition @style(['display:none' => $openModule !== $key])>
                 @foreach($module['children'] as $child => $childRoute)
                      <a href="{{ $childRoute ? route($childRoute) : '#' }}" style="
                         display:block; text-decoration:none;

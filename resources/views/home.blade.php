@@ -3,8 +3,30 @@
 
     <div style="flex:1; overflow-y:auto; padding:32px; display:flex; flex-direction:column;">
 
+        @php
+            $agora = now();
+
+            $saudacao = match (true) {
+                // A madrugada ainda é "boa noite" — só "hour < 12" daria
+                // "Bom dia" à 1h da manhã.
+                $agora->hour < 6 => 'Boa noite',
+                $agora->hour < 12 => 'Bom dia',
+                $agora->hour < 18 => 'Boa tarde',
+                default => 'Boa noite',
+            };
+
+            $data = Str::ucfirst($agora->isoFormat('dddd, D [de] MMMM [de] YYYY'));
+
+            // Só o primeiro nome: "Boa noite, Marcelo." lê melhor que o nome completo.
+            $nome = Str::before(auth()->user()?->name ?? '', ' ');
+
+            // Montado aqui, e não no atributo: aspas duplas dentro de :title="..."
+            // fecham o atributo e o Blade engole o resto do arquivo sem erro.
+            $titulo = $nome ? "{$saudacao}, {$nome}." : $saudacao;
+        @endphp
+
         {{-- Saudação --}}
-        <x-ui.page-header title="Bom dia, Marcelo." subtitle="Terça-feira, 1 de julho de 2025" />
+        <x-ui.page-header :title="$titulo" :subtitle="$data" />
 
         {{-- Cards de resumo --}}
         <div style="display:flex; gap:16px; margin-top:24px; flex-wrap:wrap;">

@@ -29,15 +29,13 @@ class UpdateManager extends Component
 
     public string $versaoAtual = '';
 
-    public bool $rodandoNoDesktop = false;
+    public bool $appEmpacotado = false;
 
     public function mount(): void
     {
-        // env() direto é furado aqui: o app empacotado roda `artisan optimize`
-        // no boot e cacheia o config, então uma leitura de env() pode não
-        // refletir mais nada depois disso. config('nativephp-internal.running')
-        // é o valor já resolvido no cache.
-        $this->rodandoNoDesktop = (bool) config('nativephp-internal.running');
+
+        $this->appEmpacotado = (bool) config('nativephp-internal.running')
+            && config('app.env') === 'production';
 
         // NATIVEPHP_APP_VERSION só existe no ambiente do build (é isso que
         // vira config('nativephp.version')) — nada escreve esse valor no .env
@@ -45,7 +43,7 @@ class UpdateManager extends Component
         // primeiro `artisan optimize`. No app instalado, a versão de verdade
         // vem do próprio Electron via App::version(); fora dele (make web,
         // testes) não há Electron para perguntar, então caímos no config.
-        $this->versaoAtual = $this->rodandoNoDesktop
+        $this->versaoAtual = $this->appEmpacotado
             ? App::version()
             : (string) config('nativephp.version');
     }

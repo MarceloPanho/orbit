@@ -9,13 +9,13 @@
 <div style="{{ $shell }}">
 
     @unless($embedded)
-        <x-ui.page-header title="Categorias" subtitle="Categorais dos gastos" />
+        <x-ui.page-header title="Categorias" subtitle="Categorias dos gastos" />
     @endunless
 
-    <x-ui.card :title="$editingId ? 'Editar categoria' : 'Novo categoria'">
+    <x-ui.card :title="$editingId ? 'Editar categoria' : 'Nova categoria'">
         <form wire:submit="saveExpenseCategory" style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;">
             <div style="flex:2; min-width:200px;">
-                <x-ui.input label="Descrição" type="text" placeholder="Ex.: Comida, Casa…" wire:model="name" />
+                <x-ui.input label="Nome" type="text" placeholder="Ex.: Comida, Casa…" wire:model="name" />
                 @error('name') <span style="font-size:11px; color:var(--orbit-danger);">{{ $message }}</span> @enderror
             </div>
 
@@ -29,10 +29,10 @@
     </x-ui.card>
 
 
-    <x-ui.card title="Categorias" flush>
+    <x-ui.card flush>
         <x-ui.table>
             <x-slot:head>
-                <x-ui.th>Descrição</x-ui.th>
+                <x-ui.th>Nome</x-ui.th>
                 <x-ui.th align="right">Ações</x-ui.th>
             </x-slot:head>
 
