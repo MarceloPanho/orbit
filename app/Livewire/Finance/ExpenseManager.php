@@ -29,6 +29,7 @@ class ExpenseManager extends Component
     // --- Filtros da tabela ---
     public string $search = '';
     public ?int $filterCategoryId = null;
+    public ?int $filterPaymentMethodId = null;
 
     public function mount(): void
     {
@@ -42,6 +43,11 @@ class ExpenseManager extends Component
     }
 
     public function updatingFilterCategoryId(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFilterPaymentMethodId(): void
     {
         $this->resetPage();
     }
@@ -137,49 +143,18 @@ class ExpenseManager extends Component
         }
     }
 
-    public function addMethod(): void
+    #[On('payment-method-updated')]
+    public function refreshMethod(): void
     {
-        $data = $this->validate(
-            ['newMethod' => ['required', 'string', 'max:255', 'unique:payment_methods,name']],
-            attributes: ['newMethod' => 'método'],
-        );
-
-        PaymentMethod::create(['name' => $data['newMethod']]);
-        $this->newMethod = '';
-        $this->dispatch('close-modal', name: 'add-method');
-    }
-
-    public function startEditMethod(int $id): void
-    {
-        $method = PaymentMethod::findOrFail($id);
-        $this->editingMethodId = $method->id;
-        $this->editingMethodName = $method->name;
-    }
-
-    public function saveMethod(): void
-    {
-        $data = $this->validate(
-            ['editingMethodName' => ['required', 'string', 'max:255', 'unique:payment_methods,name,'.$this->editingMethodId]],
-            attributes: ['editingMethodName' => 'método'],
-        );
-
-        PaymentMethod::findOrFail($this->editingMethodId)->update(['name' => $data['editingMethodName']]);
-        $this->reset(['editingMethodId', 'editingMethodName']);
-    }
-
-    public function deleteMethod(int $id): void
-    {
-        $method = PaymentMethod::findOrFail($id);
-
-        if ($method->expenses()->exists()) {
-            session()->flash('error', "O método \"{$method->name}\" está em uso e não pode ser excluído.");
-
-            return;
+        if ($this->paymentMethodId && ! PaymentMethod::whereKey($this->paymentMethodId)->exists()) {
+            $this->paymentMethodId = null;
         }
 
-        $method->delete();
+        if ($this->filterPaymentMethodId && ! PaymentMethod::whereKey($this->filterPaymentMethodId)->exists()) {
+            $this->filterPaymentMethodId = null;
+            $this->resetPage();
+        }
     }
-
     // ================= Render =================
 
     public function render()

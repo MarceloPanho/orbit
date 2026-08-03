@@ -4,7 +4,8 @@
     $isRetro = auth()->user()?->isRetro();
 
     $modules = [
-        'financas' => ['label' => 'Finanças', 'children' => ['Dashboard' => null, 'Gastos' => 'expense', 'Renda/Recebimentos' => null, 'Investimentos' => null, 'Assinaturas' => null, 'Categorias' => 'expense-category']],
+        'financas' => ['label' => 'Finanças', 'children' => ['Gastos' => 'expense', 'Categorias' => 'expense-category','Métodos de Pagamento' => 'payment-method']],
+        //'financas' => ['label' => 'Finanças', 'children' => ['Dashboard' => null, 'Gastos' => 'expense', 'Renda/Recebimentos' => null, 'Investimentos' => null, 'Assinaturas' => null, 'Categorias' => 'expense-category','Métodos de Pagamento' => 'payment-method']],
         // 'agenda'   => ['label' => 'Agenda',   'children' => ['Hoje', 'Semana', 'Eventos', 'Tarefas']],
         // 'notas'    => ['label' => 'Notas',    'children' => ['Todas as notas', 'Por tag', 'Favoritas']],
         // 'habitos'  => ['label' => 'Hábitos',  'children' => ['Hoje', 'Histórico', 'Metas']],
@@ -43,7 +44,10 @@
         @endif
     </a>
 
-    <nav style="flex:1; overflow:hidden; padding:12px 8px;" x-data="{ open: @js($openModule) }">
+    {{-- overflow-y:auto, não hidden: com os módulos todos ativos numa tela baixa
+         o menu passa da altura da sidebar, e com hidden os últimos itens
+         (Configurações, Ajuda) sumiam sem barra de rolagem para alcançá-los. --}}
+    <nav style="flex:1; overflow-y:auto; overflow-x:hidden; padding:12px 8px;" x-data="{ open: @js($openModule) }">
 
         {{-- Seção: módulos --}}
         <x-ui.nav-section label="Módulos" />

@@ -6,7 +6,14 @@
 
 @php $isRetro = auth()->user()?->isRetro(); @endphp
 
-<div style="background:var(--orbit-bg-surface); border:var(--orbit-border-width) solid var(--orbit-border); border-radius:var(--orbit-radius); overflow:hidden;">
+{{-- flex-shrink:0 não é enfeite. As páginas põem os cards dentro de um
+     "display:flex; flex-direction:column; overflow-y:auto", e pela spec do
+     flexbox o tamanho mínimo automático de um item vira 0 quando o overflow
+     dele não é visible — que é justo o caso deste overflow:hidden, necessário
+     para o border-radius recortar o cabeçalho e a tabela. Sem travar o
+     encolhimento, em tela mais baixa os cards eram esmagados e o conteúdo
+     recortado, em vez de o container ganhar barra de rolagem. --}}
+<div style="flex-shrink:0; background:var(--orbit-bg-surface); border:var(--orbit-border-width) solid var(--orbit-border); border-radius:var(--orbit-radius); overflow:hidden;">
 
     @if($title !== null || isset($actions))
         @if($isRetro)
