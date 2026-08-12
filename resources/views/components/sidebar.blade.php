@@ -4,8 +4,7 @@
     $isRetro = auth()->user()?->isRetro();
 
     $modules = [
-        'financas' => ['label' => 'Finanças', 'children' => ['Gastos' => 'expense', 'Categorias' => 'expense-category','Métodos de Pagamento' => 'payment-method']],
-        //'financas' => ['label' => 'Finanças', 'children' => ['Dashboard' => null, 'Gastos' => 'expense', 'Renda/Recebimentos' => null, 'Investimentos' => null, 'Assinaturas' => null, 'Categorias' => 'expense-category','Métodos de Pagamento' => 'payment-method']],
+        'financas' => ['label' => 'Finanças', 'children' => ['Gastos' => 'expense', 'Categorias de Gastos' => 'expense-category','Métodos de Pagamento' => 'payment-method', 'Renda/Recebimentos' => 'income', 'Categorias de Renda/Recebimentos' => 'income-category']],
         // 'agenda'   => ['label' => 'Agenda',   'children' => ['Hoje', 'Semana', 'Eventos', 'Tarefas']],
         // 'notas'    => ['label' => 'Notas',    'children' => ['Todas as notas', 'Por tag', 'Favoritas']],
         // 'habitos'  => ['label' => 'Hábitos',  'children' => ['Hoje', 'Histórico', 'Metas']],
