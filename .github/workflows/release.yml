@@ -38,8 +38,13 @@ jobs:
           node-version: '22'
           cache: npm
 
+      # --no-dev não é só tamanho: o package:discover grava os providers dos
+      # pacotes de dev em bootstrap/cache/packages.php, que vai no bundle. Com
+      # eles dentro, o PailServiceProvider é registrado no app instalado e passa
+      # a escutar MessageLogged — varrendo storage/pail a cada linha de log,
+      # para ninguém. Fora isso, poupa ~40 MB de pint/faker/phpunit no pacote.
       - name: Instalar dependências PHP
-        run: composer install --no-interaction --prefer-dist --no-progress
+        run: composer install --no-interaction --prefer-dist --no-progress --no-dev
 
       # Correções no nativephp/desktop que não têm override pelo projeto. Falha
       # de propósito se o upstream mudar o código-alvo, em vez de silenciosamente
@@ -56,10 +61,19 @@ jobs:
       # O .env é empacotado no bundle. APP_ENV, APP_DEBUG e APP_KEY são removidos
       # pelo cleanup_env_keys (config/nativephp.php), mas o artisan precisa de uma
       # chave válida para rodar durante o build.
+      #
+      # LOG_LEVEL não pode ser só removido: o config/logging.php cai em
+      # env('LOG_LEVEL', 'debug'), então tirar a chave mantém o nível em debug.
+      # Precisa ser reescrito. sed com verificação depois, porque `sed -i` que não
+      # casa nada sai com status 0 — a etapa passaria e o pacote continuaria
+      # gravando log de debug a cada requisição.
       - name: Preparar .env de produção
         shell: bash
         run: |
           cp .env.example .env
+          sed -i 's/^LOG_LEVEL=.*/LOG_LEVEL=warning/' .env
+          # \r? porque no runner Windows o checkout pode deixar o arquivo em CRLF.
+          grep -qE '^LOG_LEVEL=warning\r?$' .env || { echo "LOG_LEVEL não virou warning no .env"; exit 1; }
           php artisan key:generate --ansi
 
       - name: Derivar a versão da tag
