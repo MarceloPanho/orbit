@@ -38,11 +38,38 @@ Pegue o instalador da sua plataforma na **[página de Releases](https://github.c
 |---|---|---|
 | **Windows** 10/11 | `Orbit-x.y.z-setup.exe` | Duplo clique. Cria atalho na área de trabalho. |
 | **Linux** (qualquer distro) | `Orbit-x.y.z.AppImage` | `chmod +x Orbit-*.AppImage` e execute. **Se atualiza sozinho.** |
-| **Linux** (Debian/Ubuntu) | `orbit_x.y.z_amd64.deb` | `sudo apt install ./orbit_*.deb`. Integra melhor ao sistema, mas **não** se atualiza sozinho. |
+| **Linux** (Debian/Ubuntu) | `orbit_x.y.z_amd64.deb` | `sudo apt install ./orbit_*.deb` — **pelo terminal**, veja abaixo. |
+
+> [!IMPORTANT]
+> **Ubuntu 24.04+: o AppImage precisa do FUSE 2**, que deixou de vir instalado.
+> Sem ele o app não abre e o erro (`dlopen(): error loading libfuse.so.2`) parece
+> defeito do programa, mas é só dependência:
+>
+> ```bash
+> sudo apt install libfuse2t64   # 22.04 e anteriores: libfuse2
+> ```
+>
+> **O `.deb` não instala com duplo clique** no 24.04+. A Central de Aplicativos
+> virou snap-first e perdeu o plugin que trata `.deb` local, então o clique não
+> faz nada — sem erro, sem janela. Instale pelo terminal com o comando da tabela,
+> ou use o `gdebi` (`sudo apt install gdebi`) para ter um instalador gráfico.
 
 > [!TIP]
-> **No Linux, prefira o AppImage.** É o único formato que recebe as atualizações
-> automáticas descritas abaixo. O `.deb` precisa ser reinstalado à mão a cada versão.
+> **No Linux, prefira o AppImage.** Ele se atualiza sem pedir senha e baixa só os
+> blocos que mudaram. O `.deb` também recebe atualização automática pelo app, mas
+> exige senha de administrador a cada uma (instala em `/opt`, via `pkexec dpkg -i`)
+> e rebaixa o pacote inteiro, porque só o AppImage é publicado com blockmap.
+>
+> O AppImage, por outro lado, não cria ícone nem entrada de menu sozinho — é da
+> natureza do formato. Para integrá-lo ao sistema (move para `~/Applications`,
+> extrai o ícone oficial do bundle e cria o atalho no menu):
+>
+> ```bash
+> curl -fsSLO https://raw.githubusercontent.com/MarceloPanho/orbit/main/scripts/install-appimage.sh
+> bash install-appimage.sh ~/Downloads/Orbit-*.AppImage
+> ```
+>
+> Quem já clonou o repositório roda direto: `./scripts/install-appimage.sh`.
 
 > [!NOTE]
 > **No Windows, o SmartScreen vai reclamar.** O instalador não é assinado
@@ -69,7 +96,7 @@ backup, copie essa pasta.
 
 | | Status |
 |---|---|
-| 💸 **Finanças**: despesas e categorias de gasto | Disponível |
+| 💸 **Finanças**: despesas, categorias de gasto e recebimentos | Disponível |
 | 💸 **Finanças**: demais funcionalidades | Em construção |
 | 🗓️ **Agenda** | Em construção |
 | 📝 **Notas** | Em construção |

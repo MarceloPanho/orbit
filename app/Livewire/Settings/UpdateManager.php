@@ -56,6 +56,29 @@ class UpdateManager extends Component
         AutoUpdater::checkForUpdates();
     }
 
+    /**
+     * Rede de segurança para a verificação que nunca volta.
+     *
+     * O estado 'verificando' é escrito aqui no PHP; sair dele depende de um
+     * evento do Electron. Se a ponte de eventos quebra — foi o que aconteceu
+     * no pacote Windows, com o livewire-dispatcher.js faltando no bundle —
+     * nenhum evento chega, nem o de erro, e a tela fica girando para sempre
+     * sem dar pista nenhuma de que algo está errado.
+     *
+     * Checar versão baixa alguns KB de YAML; 30s é folga generosa.
+     */
+    public function tempoEsgotado(): void
+    {
+        // Chega chamada de timer velho depois de o estado já ter mudado —
+        // ignorar é o certo, senão um evento que voltou vira erro na tela.
+        if ($this->estado !== 'verificando') {
+            return;
+        }
+
+        $this->estado = 'erro';
+        $this->mensagemErro = 'A verificação não respondeu a tempo. Detalhes em updater.log, na pasta de dados do app.';
+    }
+
     public function baixar(): void
     {
         $this->estado = 'baixando';

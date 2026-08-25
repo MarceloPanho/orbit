@@ -22,7 +22,13 @@
                         Neste clone de desenvolvimento, atualize com <code>make update</code>.
                     </span>
                 @elseif($estado === 'verificando')
-                    <span style="font-size:13px; color:var(--orbit-fg);">Verificando atualizações…</span>
+                    {{-- O timer é a única saída deste estado se nenhum evento do
+                         Electron voltar. wire:key força o Alpine a remontar (e
+                         reiniciar a contagem) a cada nova verificação. --}}
+                    <span style="font-size:13px; color:var(--orbit-fg);"
+                        wire:key="verificando"
+                        x-data
+                        x-init="setTimeout(() => $wire.tempoEsgotado(), 30000)">Verificando atualizações…</span>
                 @elseif($estado === 'disponivel')
                     <span style="font-size:13px; color:var(--orbit-fg);">
                         <span style="color:var(--orbit-accent);">●</span>

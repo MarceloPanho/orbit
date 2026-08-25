@@ -41,6 +41,13 @@ jobs:
       - name: Instalar dependências PHP
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      # Correções no nativephp/desktop que não têm override pelo projeto. Falha
+      # de propósito se o upstream mudar o código-alvo, em vez de silenciosamente
+      # não aplicar e voltar a publicar os defeitos. Detalhes em cada patch.
+      - name: Aplicar patches no NativePHP
+        shell: bash
+        run: bash ./scripts/patch-nativephp.sh
+
       - name: Instalar dependências JS e compilar assets
         run: |
           npm ci --no-fund --no-audit
